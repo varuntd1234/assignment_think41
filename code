@@ -1,0 +1,67 @@
+import React, { useState, useRef } from "react";
+
+export default function TextEditorWithLineNumbers() {
+  const [text, setText] = useState("");
+  const [jumpLine, setJumpLine] = useState("");
+  const textAreaRef = useRef(null);
+
+  const lines = text.split("\n");
+
+  const handleScroll = () => {
+    const lineNumberGutter = document.getElementById("line-numbers");
+    lineNumberGutter.scrollTop = textAreaRef.current.scrollTop;
+  };
+
+  const handleJump = () => {
+    const lineNumber = parseInt(jumpLine);
+    if (!isNaN(lineNumber) && lineNumber > 0 && lineNumber <= lines.length) {
+      const lineHeight = 20; // Adjust according to styling
+      textAreaRef.current.scrollTop = (lineNumber - 1) * lineHeight;
+    } else {
+      alert("Invalid line number");
+    }
+  };
+
+  return (
+    <div className="flex p-4 gap-4">
+      <div className="flex flex-col">
+        <div className="flex gap-2 mb-2">
+          <input
+            type="number"
+            className="border px-2 py-1 rounded"
+            placeholder="Jump to line"
+            value={jumpLine}
+            onChange={(e) => setJumpLine(e.target.value)}
+          />
+          <button
+            onClick={handleJump}
+            className="bg-blue-500 text-white px-4 py-1 rounded"
+          >
+            Jump
+          </button>
+        </div>
+        <div className="relative flex border rounded overflow-hidden" style={{ height: '300px' }}>
+          <div
+            id="line-numbers"
+            className="bg-gray-200 text-right pr-2 text-sm leading-5"
+            style={{ width: "40px", overflow: "hidden" }}
+          >
+            {lines.map((_, i) => (
+              <div key={i} style={{ height: "20px" }}>
+                {i + 1}
+              </div>
+            ))}
+          </div>
+          <textarea
+            ref={textAreaRef}
+            className="flex-1 pl-2 text-sm resize-none leading-5 outline-none"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onScroll={handleScroll}
+            style={{ height: "100%", lineHeight: "20px" }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
